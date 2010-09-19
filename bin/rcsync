@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+
+use App::Rcsync;
+App::Rcsync->run;

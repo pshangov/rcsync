@@ -1,10 +1,12 @@
 package App::Rcsync;
 
+# ABSTRACT: Sync configuration files across machines
+
 use strict;
 use warnings;
 
 use File::HomeDir;
-use Data::AsObject;
+use Data::AsObject qw(dao);
 use Template;
 use Config::General;
 use File::Spec;
@@ -30,7 +32,7 @@ sub validate_args
 	{
 		$self->usage_error("Please specify profiles to sync");
 	}
-	elsif if ( $opt->{all} and @$args )
+	elsif ( $opt->{all} and @$args )
 	{
 		$self->usage_error("'all' option conflicts with individual profiles as args");
 	}

@@ -7,6 +7,7 @@ use File::HomeDir;
 use Data::AsObject;
 use Template;
 use Config::General;
+use File::Spec;
 use Carp;
 
 use base qw(App::Cmd::Simple);
@@ -14,9 +15,10 @@ use base qw(App::Cmd::Simple);
 sub opt_spec 
 {
 	return (
-		[ "config|c", "configuration file to use", { default => File::HomeDir->my_home . '.rcsync.conf' } ],
-		[ "all|a",    "sync all profiles"      ],
-		[ "stdout|s", "print output to STDOUT" ],
+		[ "config|c=s", "configuration file to use", { default => File::HomeDir->my_home . '.rcsync.conf' } ],
+		[ "all|a",      "sync all profiles"      ],
+		[ "list|l",     "list all profiles"      ],
+		[ "stdout|s",   "print output to STDOUT" ],
 	);
 }
 
@@ -40,15 +42,22 @@ sub execute
 
 	my %config = Config::General->new( $opt->{config} );
 	my @profiles = $opt->{all} ? @$args : keys %config;
+	my $base_dir = $config{base_dir};
 	my $tt = Template->new or croak Template->error;
 
 	foreach my $profile_name (@profiles)
 	{
+		if ( $opt->{list} )
+		{
+			print "$profile_name\n";
+			next;
+		}
+
 		my $profile = dao $config{$profile_name};
 		
 		$tt->process(
-			$profile->template,
-			$profile->params,
+			File::Spec->catfile( $base_dir, $profile->template ),
+			$profile->param,
 			$opt->{stdout} ? \*STDOUT : $profile->filename,
 		) or croak $tt->error;
 

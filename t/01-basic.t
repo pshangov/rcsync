@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More tests => 2;
 use App::Cmd::Tester;
+use App::Rcsync;
 use Test::Differences;
 use File::Temp qw(tempfile);
 use File::Spec;
@@ -12,13 +13,13 @@ use Try::Tiny;
 my ( $config_fh, $config_filename ) = tempfile();
 my ( $tmpl_fh, $tmpl_filename ) = tempfile();
 
-my $tmpl_parent = File::Spec->updir( $tmpl_filename );
-(undef, undef, my $tmpl_basename) = File::Spec->splitpath( $tmpl_filename );
+my ($tmpl_volume, $tmpl_path, $tmpl_basename) = File::Spec->splitpath( $tmpl_filename );
+my $tmpl_parent = File::Spec->catdir( $tmpl_volume, $tmpl_path );
 
 my $config = <<"CONFIG";
 base_dir $tmpl_parent
 <test1>
-	template $tmpl_filename
+	template $tmpl_basename
 	filename doesnt_matter
 	<param>
 		param1 value1
@@ -35,17 +36,15 @@ TEMPLATE
 print $config_fh $config or die $!;
 print $tmpl_fh $template or die $!;
 
+close $config_fh;
+close $tmpl_fh;
+
 my $output = <<OUTPUT;
 setting1 = value1
 setting2 = value2
 OUTPUT
 
-my $result;
-
-$result = test_app( 'App::Rcsync' => [ 'rcsync', '--config', $config_filename, '--all', '--stdout', 'test1' ] );
-
-diag "We are here";
-
+my $result = test_app( 'App::Rcsync' => [ '--config', $config_filename, '--stdout', 'test1' ] );
 
 eq_or_diff($result->stdout, $output, 'file parsed properly');
 eq_or_diff($result->error, undef, 'threw no exceptions');

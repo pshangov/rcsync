@@ -42,10 +42,9 @@ sub execute
 {
 	my ($self, $opt, $args) = @_;
 
-	my %config = Config::General->new( $opt->{config} );
-	my @profiles = $opt->{all} ? @$args : keys %config;
-	my $base_dir = $config{base_dir};
-	my $tt = Template->new or croak Template->error;
+	my %config = Config::General->new( $opt->{config} )->getall;	
+	my @profiles = $opt->{all} ? @$args : grep { $_ ne 'base_dir' } keys %config;
+	my $tt = Template->new( INCLUDE_PATH => $config{base_dir} ) or croak Template->error;
 
 	foreach my $profile_name (@profiles)
 	{
@@ -58,10 +57,12 @@ sub execute
 		my $profile = dao $config{$profile_name};
 		
 		$tt->process(
-			File::Spec->catfile( $base_dir, $profile->template ),
+			$profile->template,
 			$profile->param,
 			$opt->{stdout} ? \*STDOUT : $profile->filename,
-		) or croak $tt->error;
+		) or die $tt->error;
+
+		
 
 		if (!$opt->{stdout})
 		{

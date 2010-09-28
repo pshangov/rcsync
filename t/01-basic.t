@@ -47,5 +47,5 @@ OUTPUT
 my $result = test_app( 'App::Rcsync' => [ '--config', $config_filename, '--stdout', 'test1' ] );
 
 eq_or_diff($result->stdout, $output, 'file parsed properly');
-eq_or_diff($result->error, undef, 'threw no exceptions');
+is($result->error, undef, 'threw no exceptions');
 

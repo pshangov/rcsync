@@ -11,26 +11,26 @@ rcsync - Synchronize configuration files across machines
 
 In your C<$HOME/.rcsync>:
 
-	base_dir /home/supermario/rcsync
+    base_dir /home/supermario/rcsync
 
-	<vim>
-		filename /home/supermario/.vimrc
-		template vimrc.tt
-		<params>
-			backupdir /tmp/vim
-		</params>
-	</vim>
+    <vim>
+        filename /home/supermario/.vimrc
+        template vimrc.tt
+        <params>
+            backupdir /tmp/vim
+        </params>
+    </vim>
 
 In C<$HOME/rcsync/vimrc.tt>:
-	
-	set nocompatible
-	set backup
-	set backupdir=[% backupdir %]
-	...
+
+    set nocompatible
+    set backup
+    set backupdir=[% backupdir %]
+    ...
 
 From the command line:
 
-	rcsync vim
+    rcsync vim
 
 =head1 USAGE
 
@@ -51,6 +51,10 @@ List the names of all profiles
 =item --config
 
 Specify a configuration file to use
+
+=item --init
+
+Create a stub configuration file in <$HOME/.rcsync> if one does not exist yet
 
 =item --stdout
 

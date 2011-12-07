@@ -1,5 +1,5 @@
-use strict;
 use warnings;
+use strict;
 
 use Test::More tests => 2;
 use App::Cmd::Tester;
@@ -19,12 +19,12 @@ my $tmpl_parent = File::Spec->catdir( $tmpl_volume, $tmpl_path );
 my $config = <<"CONFIG";
 base_dir $tmpl_parent
 <test1>
-	template $tmpl_basename
-	filename doesnt_matter
-	<param>
-		param1 value1
-		param2 value2
-	</param>
+    template $tmpl_basename
+    filename doesnt_matter
+    <param>
+        param1 value1
+        param2 value2
+    </param>
 </test1>
 CONFIG
 

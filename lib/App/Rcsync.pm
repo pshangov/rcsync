@@ -18,13 +18,15 @@ use base qw(App::Cmd::Simple);
 sub opt_spec
 {
     return (
+        [ "help|h",     "display usage information"      ],
         [ "config|c=s", "configuration file to use",
             { default => file( File::HomeDir->my_home, '.rcsync' ) }
         ],
-        [ "all|a",      "sync all profiles"         ],
-        [ "list|l",     "list all profiles"         ],
-        [ "init|i",     "create configuration file" ],
-        [ "stdout|s",   "print to STDOUT"           ],
+        [ "all|a",      "sync all profiles"              ],
+        [ "list|l",     "list all profiles"              ],
+        [ "init|i",     "create configuration file"      ],
+        [ "which|w",    "print path to profile template" ],
+        [ "stdout|s",   "print to STDOUT"                ],
     );
 }
 
@@ -37,7 +39,7 @@ sub validate_args
         $self->usage_error("Configuration file " . $opt->{config} . " not found, aborting");
     }
 
-    if ( !$opt->{init} and !$opt->{all} and !$opt->{list} and !@$args )
+    if ( !$opt->{help} and !$opt->{init} and !$opt->{all} and !$opt->{list} and !@$args )
     {
         $self->usage_error("Please specify profiles to sync");
     }
@@ -99,6 +101,10 @@ sub execute
 
         return;
     }
+    elsif ($opt->{help})
+    {
+        print $self->app->usage->text;
+    }
 
     my %config = Config::General->new( $opt->{config} )->getall;
     my @all_profiles = grep { ref $config{$_} eq 'HASH' } keys %config;
@@ -113,6 +119,20 @@ sub execute
         print "$_\n" for @all_profiles;
         return;
     }
+    elsif ( $opt->{which} )
+    {
+        my $profile_name = $$args[0];
+        if ( exists $profiles_config{$profile_name} )
+        {
+            print file($config{base_dir}, $profiles_config{$profile_name}{template})->absolute->stringify;
+        }
+        else
+        {
+            warn "No such profile '$profile_name'\n";
+        }
+        return;
+    }
+
 
     my $tt = Template->new( INCLUDE_PATH => $config{base_dir} ) or die Template->error;
 

@@ -48,6 +48,10 @@ Sync all profiles
 
 List the names of all profiles
 
+=item --which
+
+Print the path to the template for the specified profile
+
 =item --config
 
 Specify a configuration file to use
